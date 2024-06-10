@@ -2,6 +2,8 @@ package main
 
 import (
 	"ShorterAPI/internal/config"
+	"ShorterAPI/internal/lib/logger/sl"
+	"ShorterAPI/internal/storage/sqlite"
 	"log/slog"
 	"os"
 )
@@ -17,6 +19,13 @@ func main() {
 	log := setupLogger(cfg.Env)
 	log.Info("starting server")
 	log.Debug("debug logging enabled")
+
+	storage, err := sqlite.New(cfg.StoragePath)
+	if err != nil {
+		log.Error("error opening storage", sl.Err(err))
+		os.Exit(1)
+	}
+	_ = storage
 }
 
 func setupLogger(env string) *slog.Logger {
