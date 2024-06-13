@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/mattn/go-sqlite3"
+	"strings"
 )
 
 type Storage struct {
@@ -79,6 +80,17 @@ func (s *Storage) GetUrl(alias string) (string, error) {
 
 func (s *Storage) DeleteUrl(alias string) error {
 	const op = "storage.sqlite.DeleteUrl"
-	//TODO: implement deleteUrl
+	stmt, err := s.db.Prepare("DELETE FROM url WHERE alias = ?")
+	if err != nil {
+		return fmt.Errorf("%s : %w", op, storage.ErrURLNotFound)
+	}
+	var res string
+	err = stmt.QueryRow(alias).Scan(&res)
+	if err != nil {
+		if strings.Contains(err.Error(), "no rows in result set") {
+			return fmt.Errorf("%s : %w", op, storage.ErrURLNotFound)
+		}
+		return fmt.Errorf("%s : %w", op, err)
+	}
 	return nil
 }
