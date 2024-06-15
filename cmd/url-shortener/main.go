@@ -2,6 +2,7 @@ package main
 
 import (
 	"ShorterAPI/internal/config"
+	"ShorterAPI/internal/http-server/handlers/redirect"
 	"ShorterAPI/internal/http-server/handlers/url/save"
 	"ShorterAPI/internal/http-server/middleware/logger"
 	"ShorterAPI/internal/lib/logger/handlers/slogpretty"
@@ -37,6 +38,7 @@ func main() {
 	router.Use(middleware.URLFormat)
 
 	router.Post("/url", save.New(log, storage))
+	router.Get("/{alias}", redirect.New(log, storage))
 	log.Info("server started", slog.String("address", cfg.Address))
 	srv := &http.Server{
 		Addr:         cfg.Address,
